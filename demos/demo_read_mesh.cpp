@@ -197,8 +197,9 @@ int main(int argc, char* argv[]) {
         Vec3d receiver_origin(0, 0, 10.0); // origin of the receiver
 
 
-		std::string mesh_file = "../data/sphere.obj";
+		std::string mesh_file = "../data/structured_mesh.obj";
 		mesh_receiver receiver(mesh_file);
+        receiver.scale(10); // scale the mesh if needed
 		int num_triangles = receiver.get_num_triangles();
 		std::cout << "Number of triangles in the mesh: " << num_triangles << std::endl;
 
@@ -207,6 +208,7 @@ int main(int argc, char* argv[]) {
             Vec3d p2 = receiver.get_v1(i);
             Vec3d p3 = receiver.get_v2(i);
             Vec3d normal = receiver.get_normal(i);
+            //normal = normal * (-1.0);
             Vec3d receiver_aim_point = receiver_origin + normal; // aim point of the receiver
             auto e4 = std::make_shared<CspElement>();
             e4->set_origin(receiver_origin);

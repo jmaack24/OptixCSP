@@ -20,6 +20,9 @@
 using namespace OptixCSP;
 
 // TODO: optix related type should go into one header file
+// i don't know what we should put here in hit group record, material is handled through a global array 
+// we can leave this empty for now ... 
+// note that this is has to be per optical entity type. 
 typedef Record<OptixCSP::HitGroupData> HitGroupRecord;
 
 void SolTraceSystem::print_launch_params() {
@@ -144,7 +147,7 @@ void SolTraceSystem::initialize() {
     // Link the GAS handle.
     data_manager->launch_params_H.handle = m_state.gas_handle;
     data_manager->allocateGeometryDataArray(geometry_manager->get_geometry_data_array());
-
+    data_manager->allocateMaterialDataArray(geometry_manager->get_material_data_array());
     print_launch_params();
 
 
@@ -518,31 +521,31 @@ void SolTraceSystem::create_shader_binding_table(){
             case OptixCSP::OpticalEntityType::RECTANGLE_FLAT_MIRROR: 
 				map = { SurfaceType::FLAT, ApertureType::RECTANGLE };
                 program_group_handle = pipeline_manager->getMirrorProgram(map);
-                hitgroup_records_list[i].data.material_data.mirror = {0.875425, 0, 0, 0};
+                hitgroup_records_list[i].data.material_data = {0.875425, 0, 0, 0};
                 printf("RECTANGLE_FLAT_MIRROR, program group address: %p \n", program_group_handle);
 				break;
             case OptixCSP::OpticalEntityType::RECTANGLE_PARABOLIC_MIRROR:
                 map = { SurfaceType::PARABOLIC, ApertureType::RECTANGLE };
                 program_group_handle = pipeline_manager->getMirrorProgram(map);
-                hitgroup_records_list[i].data.material_data.mirror = { 0.875425, 0, 0, 0 };
+                hitgroup_records_list[i].data.material_data = { 0.875425, 0, 0, 0 };
                 printf("RECTANGLE_PARABOLIC_MIRROR, program group address: %p \n", program_group_handle);
 
                 break;
             case OptixCSP::OpticalEntityType::RECTANGLE_FLAT_RECEIVER:
                 program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::FLAT, ApertureType::RECTANGLE);
-				hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
+				hitgroup_records_list[i].data.material_data = { 0.95, 0, 0, 0 };
                 printf("RECTANGLE_FLAT_RECEIVER, program group address: %p \n", program_group_handle);
 
                 break;
             case OptixCSP::OpticalEntityType::CYLINDRICAL_RECEIVER:
                 program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::CYLINDER, ApertureType::RECTANGLE);
-                hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
+                hitgroup_records_list[i].data.material_data = { 0.95, 0, 0, 0 };
                 printf("CYLINDRICAL_RECEIVER, program group address: %p \n", program_group_handle);
 
                 break;            
             case OptixCSP::OpticalEntityType::TRIANGLE_FLAT_RECEIVER:
                 program_group_handle = pipeline_manager->getReceiverProgram(SurfaceType::FLAT, ApertureType::TRIANGLE);
-                hitgroup_records_list[i].data.material_data.receiver = { 0.95, 0, 0, 0 };
+                hitgroup_records_list[i].data.material_data = { 0.95, 0, 0, 0 };
                 printf("TRIANGLE_FLAT_RECEIVER, program group address: %p \n", program_group_handle);
 				break;
             default:
@@ -598,6 +601,9 @@ void SolTraceSystem::set_sun_vector(Vec3d vect) {
 	data_manager->launch_params_H.sun_vector = OptixCSP::toFloat3(sun_v);
 }
 
+////////////////////////////
+//  parsing st input file //
+////////////////////////////
 std::vector<std::string> SolTraceSystem::split(const std::string& str, const std::string& delim, bool ret_empty, bool ret_delim) {
 	
     std::vector<std::string> list;

@@ -1,6 +1,8 @@
 #include <optix_device.h>
 #include <vector_types.h>
 #include "Soltrace.h"
+#include <stdio.h>
+#include "MaterialDataST.h"
 
 
 namespace OptixCSP {
@@ -30,8 +32,10 @@ extern "C" {
 
 extern "C" __global__ void __closesthit__mirror()
 {
-    //const OptixCSP::HitGroupData* sbt_data = reinterpret_cast<OptixCSP::HitGroupData*>(optixGetSbtDataPointer());
-    //const MaterialData::Mirror& mirror = sbt_data->material_data.mirror;
+	OptixCSP::MaterialData material = params.material_data_array[optixGetPrimitiveIndex()];
+
+    float transmissivity = material.transmissivity;
+
 
     // Fetch the normal vector from the hit attributes passed by OptiX
     float3 object_normal = make_float3( __uint_as_float( optixGetAttribute_0() ), __uint_as_float( optixGetAttribute_1() ),
@@ -60,7 +64,7 @@ extern "C" __global__ void __closesthit__mirror()
     // Check if the maximum recursion depth has not been reached
     if (new_depth < params.max_depth) {
         // Store the hit point in the hit point buffer (used for visualization or further calculations)
-        params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(1.0f, hit_point);
+        params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(new_depth, hit_point);
         // Store the reflected direction in its buffer (used for visualization or further calculations)
         /*
         params.reflected_dir_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(1.0f, reflected_dir);
@@ -110,7 +114,7 @@ extern "C" __global__ void __closesthit__receiver()
     // Check if the ray hits the receiver surface (dot product negative means ray is hitting the front face)
     if (dot_product < 0.0f) {
         if (new_depth < params.max_depth) {
-            params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(2.0f, hit_point);
+            params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(new_depth, hit_point);
             prd.depth = new_depth;
         }
     }
@@ -152,7 +156,7 @@ extern "C" __global__ void __closesthit__receiver__cylinder__y()
     // Check if the ray hits the receiver surface (dot product negative means ray is hitting the front face)
     //if (dot_product < 0.0f) {
         if (new_depth < params.max_depth) {
-            params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(2.0f, hit_point);
+            params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(new_depth, hit_point);
             prd.depth = new_depth;
         }
     //}
@@ -204,7 +208,7 @@ extern "C" __global__ void __closesthit__mirror__parabolic()
     // If the new depth is below the maximum, trace the reflected ray.
     if (new_depth < params.max_depth) {
         // Save the hit point (for visualization or further processing).
-        params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(1.0f, hit_point);
+        params.hit_point_buffer[params.max_depth * prd.ray_path_index + new_depth] = make_float4(new_depth, hit_point);
 
         prd.depth = new_depth;
         optixTrace(

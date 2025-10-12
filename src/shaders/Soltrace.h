@@ -52,6 +52,7 @@ namespace OptixCSP{
         float3                      sun_v3;
 
 	    GeometryDataST*             geometry_data_array;
+		MaterialData*               material_data_array;
     };
 
     struct PerRayData

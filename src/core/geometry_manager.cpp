@@ -10,11 +10,14 @@
 
 using namespace OptixCSP;
 
+
+// Collect geometry and material information from the scene elements
 void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<CspElement>>& element_list,
                                             LaunchParams& params) {    
     m_aabb_list_H.clear(); // Clear the existing AABB list
     m_sbt_index_H.clear(); // Clear the existing SBT index list
 	m_geometry_data_array_H.clear(); // Clear the existing geometry data array
+    m_material_data_array_H.clear();
 
 	m_obj_counts = static_cast<uint32_t>(element_list.size()); // Number of objects in the scene
 
@@ -22,7 +25,7 @@ void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<Cs
 	m_aabb_list_H.resize(m_obj_counts);
 	m_geometry_data_array_H.resize(m_obj_counts);
     m_sbt_index_H.resize(m_obj_counts);
-
+	m_material_data_array_H.resize(m_obj_counts);
 
     for (uint32_t i = 0; i < m_obj_counts; i++) {
 
@@ -94,6 +97,11 @@ void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<Cs
 		m_aabb_list_H[i] = aabb; // Store the AABB in the list
         m_sbt_index_H[i] = sbt_offset; // Store the SBT index
         m_geometry_data_array_H[i] = element_list[i]->toDeviceGeometryData();
+
+
+		// now we set the material data for each element, use placeholder values for now 
+        m_material_data_array_H[i] = {0.95, 0.1, 0.95, 0.1};
+
     }
 
     // print out computed minimum distance 

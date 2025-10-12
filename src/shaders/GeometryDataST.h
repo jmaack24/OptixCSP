@@ -6,6 +6,8 @@
 #define assert(x) /*nop*/
 #endif
 
+// TODO: get rid of ST suffix, no clue what it was for ... 
+
 namespace OptixCSP {
    struct GeometryDataST
     {

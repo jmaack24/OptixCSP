@@ -24,6 +24,7 @@ namespace OptixCSP {
 		/// - AABBs
 		/// - GeometryDataST on the host
 		/// - SBT index
+		/// - MaterialData info on the host
 		void collect_geometry_info(const std::vector<std::shared_ptr<CspElement>>& element_list,
 			LaunchParams& params);
 
@@ -38,6 +39,10 @@ namespace OptixCSP {
 		/// return the list of geometry data vector
 		std::vector<GeometryDataST>& get_geometry_data_array() { return m_geometry_data_array_H; }
 
+		/// return the list of material data array 
+		std::vector<MaterialData>& get_material_data_array() { return m_material_data_array_H; }
+
+
 		// compute sun plane 
 		void compute_sun_plane_H(LaunchParams& params);
 
@@ -47,10 +52,11 @@ namespace OptixCSP {
 		float m_sun_plane_distance = -1.0f; // distance of the sun plane from the origin
 		uint32_t m_obj_counts;
 
-		// data related to the geometry and the scene on the host side
+		// data related to the geometry and material of each element on the host side
 		std::vector<OptixAabb>      m_aabb_list_H;           // aabb list
 		std::vector<GeometryDataST> m_geometry_data_array_H; // geometry data
 		std::vector<uint32_t>       m_sbt_index_H;           // sbt offset index
+		std::vector<MaterialData>   m_material_data_array_H; // material data
 
 		// members related to building GAS
 		OptixBuildInput        m_aabb_input = {};                   // needed after the first build

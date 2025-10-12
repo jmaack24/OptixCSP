@@ -70,6 +70,26 @@ void dataManager::updateGeometryDataArray(std::vector<GeometryDataST> geometry_d
 
 }
 
+void dataManager::allocateMaterialDataArray(std::vector<MaterialData> material_data_array_H) {
+
+	CUDA_CHECK(cudaMalloc(reinterpret_cast<void**>(&material_data_array_D),
+		material_data_array_H.size() * sizeof(MaterialData)));
+
+	CUDA_CHECK(cudaMemcpy(material_data_array_D, material_data_array_H.data(),
+		material_data_array_H.size() * sizeof(MaterialData), cudaMemcpyHostToDevice));
+	// make sure launch_params_H is updated with the new geometry data array
+	launch_params_H.material_data_array = material_data_array_D;
+
+}
+
+void dataManager::updateMaterialDataArray(std::vector<MaterialData> material_data_array_H) {
+	if (material_data_array_D == nullptr) {
+		throw std::runtime_error("Not implemented yet ... does material data change??");
+	}
+
+}
+
+
 void dataManager::cleanup() {
 	CUDA_CHECK(cudaFree(launch_params_D));
 	launch_params_D = nullptr;

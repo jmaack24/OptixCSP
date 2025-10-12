@@ -18,6 +18,9 @@ namespace OptixCSP {
         // device pointer to geometry data
         GeometryDataST* geometry_data_array_D;
 
+        // device pointer to material data
+		MaterialData* material_data_array_D;
+
         dataManager();
         ~dataManager();
 
@@ -36,5 +39,15 @@ namespace OptixCSP {
         // update geometry_data_array_D on the device
         // then launch_params_D.geometry_data_array = geometry_data_array_D gets a copy.
         void updateGeometryDataArray(std::vector<GeometryDataST> geometry_data_array_H);
+
+        // create material_data_array_D on the device
+        // then launch_params_D.material_data_array = material_data_array_D gets a copy.
+        void allocateMaterialDataArray(std::vector<MaterialData> material_data_array);
+
+        // update material_data_array_D on the device
+        // then launch_params_D.material_data_array = material_data_array_D gets a copy.
+        void updateMaterialDataArray(std::vector<MaterialData> material_data_array_H);
+
+
     };
 }

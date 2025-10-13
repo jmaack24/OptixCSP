@@ -47,8 +47,9 @@ namespace OptixCSP {
         // write simulation summary to a file, including receiver stats, etc
 		void write_simulation_json(const std::string& filename);
 		// get number of rays hitting the receiver
-        int get_num_hits_receiver();
+        int get_num_hits_receiver(CspElement e);
 
+		std::vector<int> get_receiver_indices();
 
 
         /// Explicit cleanup

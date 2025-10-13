@@ -80,7 +80,7 @@ public:
 			vertices_v0.push_back(v0);
 			vertices_v1.push_back(v1);
             vertices_v2.push_back(v2);
-			normals.push_back(normal);
+			normals.push_back(normal * (-1.0));
 
         }
         
@@ -247,8 +247,8 @@ int main(int argc, char* argv[]) {
     //////////////////////////
     // STEP 5  Post process //
     //////////////////////////
-    int num_hits = system.get_num_hits_receiver();
-    std::cout << "Number of rays hitting the receiver: " << num_hits << std::endl;
+    //int num_hits = system.get_num_hits_receiver();
+    //std::cout << "Number of rays hitting the receiver: " << num_hits << std::endl;
 
 	std::string out_dir = "out_mesh_receiver/";
     if (!std::filesystem::exists(std::filesystem::path(out_dir))) {

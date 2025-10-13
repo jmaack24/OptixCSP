@@ -146,6 +146,12 @@ INLINE HOSTDEVICE float3 reflect(const float3& i, const float3& n)
     return i - 2.0f * n * dot(n, i);
 }
 
+// refract TODO: place holder for now, assume the direction does not change
+INLINE HOSTDEVICE float3 refract(const float3& i, const float3& n)
+{
+    return i;
+}
+
 
 #define float3_as_args( u )                                                                                            \
     reinterpret_cast<unsigned int&>( ( u ).x ), reinterpret_cast<unsigned int&>( ( u ).y ),                            \

@@ -96,11 +96,11 @@ void GeometryManager::collect_geometry_info(const std::vector<std::shared_ptr<Cs
 
 		m_aabb_list_H[i] = aabb; // Store the AABB in the list
         m_sbt_index_H[i] = sbt_offset; // Store the SBT index
-        m_geometry_data_array_H[i] = element_list[i]->toDeviceGeometryData();
+        m_geometry_data_array_H[i] = element->toDeviceGeometryData();
 
 
 		// now we set the material data for each element, use placeholder values for now 
-        m_material_data_array_H[i] = {0.95, 0.1, 0.95, 0.1};
+        m_material_data_array_H[i] = {element->get_reflectivity(), element->get_transmissivity(), element->get_slope_error(), element->get_specularity_error(), element->use_refraction()};
 
     }
 

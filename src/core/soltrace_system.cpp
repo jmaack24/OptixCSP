@@ -218,21 +218,33 @@ bool SolTraceSystem::read_st_input(const char* filename) {
     return true;
 }
 
-int SolTraceSystem::get_num_hits_receiver() {
+int SolTraceSystem::get_num_hits_receiver(CspElement receiver) {
 
     int output_size = m_num_sunpoints * data_manager->launch_params_H.max_depth;
     std::vector<float4> hp_output_buffer(output_size);
     CUDA_CHECK(cudaMemcpy(hp_output_buffer.data(), data_manager->launch_params_H.hit_point_buffer, output_size * sizeof(float4), cudaMemcpyDeviceToHost));
 
-    // go through the hit point buffer, and only collect data where the first element is 2.0f 
-	// which indicates a hit on the receiver
 
 	m_num_hits_receiver = 0;
-    for (const auto& element : hp_output_buffer) {
-        if (std::abs(element.x - 2.0) < 0.1f) { // x value of 2.0 indicates a hit on the receiver
+
+	// go through all the hit points, if the point value is inside the receiver element, count it as a hit.
+    for (int i = 0; i < output_size; i++) {
+        float4 hp = hp_output_buffer[i];
+
+        // sun ray source, skip it
+        if (hp.x == 0) continue;
+
+
+        Vec3d hit_point(hp.y, hp.z, hp.w);
+        if (receiver.in_plane(hit_point)) {
             m_num_hits_receiver++;
+            //std::cout << "ray depth " << hp.x << std::endl;
         }
-	}
+
+		//if (hp.x == 3) 
+  //          std::cout << receiver.in_plane(hit_point) << std::endl; // debug purpose only
+
+    }
     return m_num_hits_receiver;
 }
 
@@ -317,7 +329,16 @@ void SolTraceSystem::write_simulation_json(const std::string& filename) {
     out << "  },\n";
 
 
-    std::shared_ptr<CspElement> receiver = m_element_list.back();
+	std::vector<int> receiver_indices = get_receiver_indices();
+
+    if (receiver_indices.size() == 0) {
+        std::cerr << "Error: No receiver found in the system. Cannot write simulation JSON." << std::endl;
+    }
+    if (receiver_indices.size() > 1) {
+		std::cerr << "Error: More than one receiver found in the system. Luning needs to implement this!" << std::endl;
+	}
+
+    std::shared_ptr<CspElement> receiver = m_element_list[receiver_indices[0]];
 
     out << "  \"receiver\": {\n";
 
@@ -359,7 +380,7 @@ void SolTraceSystem::write_simulation_json(const std::string& filename) {
         << receiver_location[0] << ", " << receiver_location[1] << ", " << receiver_location[2] << "],\n";
 
     out << "    \"num_hits\": "
-        << get_num_hits_receiver() << ",\n";
+        << get_num_hits_receiver(*receiver) << ",\n";
 
 
     // print out rotation matrix basis
@@ -599,6 +620,18 @@ void SolTraceSystem::set_sun_vector(Vec3d vect) {
     m_sun_vector = vect;
     Vec3d sun_v = m_sun_vector.normalized(); // Normalize the sun vector
 	data_manager->launch_params_H.sun_vector = OptixCSP::toFloat3(sun_v);
+}
+
+std::vector<int> SolTraceSystem::get_receiver_indices() {
+
+	std::vector<int> receiver_indices;
+    for (int i = 0; i < m_element_list.size(); i++) {
+        if (m_element_list[i]->is_receiver()) {
+            receiver_indices.push_back(i);
+        }
+	}
+
+	return receiver_indices;
 }
 
 ////////////////////////////

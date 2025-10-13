@@ -45,8 +45,8 @@ int main(int argc, char* argv[]) {
     system.initialize();
     system.run();
 
-    int num_hits = system.get_num_hits_receiver();
-	std::cout << "Number of rays hitting the receiver: " << num_hits << std::endl;
+    //int num_hits = system.get_num_hits_receiver(system.get);
+	//std::cout << "Number of rays hitting the receiver: " << num_hits << std::endl;
 
     if (!std::filesystem::exists(std::filesystem::path(output_dir))) {
         std::cout << "Creating output directory: " << output_dir << std::endl;

@@ -67,6 +67,18 @@ namespace OptixCSP {
         void set_aperture(const std::shared_ptr<Aperture>& aperture);
         void set_surface(const std::shared_ptr<Surface>& surface);
 
+		void set_reflectivity(float val) { m_reflectivity = val; }
+		float get_reflectivity() const { return m_reflectivity; }
+        void set_transmissivity(float val) { m_transmissivity = val;}
+		float get_transmissivity() const { return m_transmissivity; }
+		void set_slope_error(float val) { m_slope_error = val; }
+		float get_slope_error() const { return m_slope_error; }
+		void set_specularity_error(float val) { m_specularity_error = val; }
+		float get_specularity_error() const { return m_specularity_error; }
+		void use_refraction(bool val) { m_use_refraction = val; }
+		bool use_refraction() const { return m_use_refraction; }
+
+
         // set orientation based on aimpoint and zrot
         void update_euler_angles(const Vec3d& aim_point, const double zrot);
 	    // set orientation based on the CspElement's aim point and zrot
@@ -93,6 +105,9 @@ namespace OptixCSP {
         // and the aperture size, we can compute the bounding box
         // this can be called when adding an element to the system
         void compute_bounding_box();
+        
+		// check if a point is inside the surface aperture
+		bool in_plane(const Vec3d& point) const;
 
 
     private:
@@ -106,6 +121,13 @@ namespace OptixCSP {
 
         std::shared_ptr<Surface> m_surface;
         std::shared_ptr<Aperture> m_aperture;
+
+        // optical properties 
+        float m_reflectivity;
+        float m_transmissivity;
+		float m_slope_error;
+		float m_specularity_error;
+		bool m_use_refraction; // for now, if true, ray goes through the object, otherwise it reflects
 
     };
 }

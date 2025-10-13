@@ -221,7 +221,7 @@ int main(int argc, char* argv[]) {
     //////////////////////////
     // STEP 5  Post process //
     //////////////////////////
-    int num_hits = system.get_num_hits_receiver();
+    int num_hits = system.get_num_hits_receiver(*e4);
     std::cout << "Number of rays hitting the receiver: " << num_hits << std::endl;
 
 	std::string out_dir = "out_three_heliostats/";

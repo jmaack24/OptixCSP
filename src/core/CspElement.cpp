@@ -23,6 +23,11 @@ CspElement::CspElement() {
     m_surface = nullptr;
     m_aperture = nullptr;
     m_receiver = false;
+    m_reflectivity = 1.0f;
+    m_transmissivity = 1.0f;
+    m_slope_error = 0.0f;
+	m_specularity_error = 0.0f;
+    m_use_refraction = false;
 }
 
 // set and get origin 
@@ -316,4 +321,31 @@ void CspElement::compute_bounding_box() {
 
 
 
+}
+
+
+
+bool CspElement::in_plane(const Vec3d& point) const {
+
+    // check if a point is inside the aperture of the surface
+    ApertureType aperture_type = m_aperture->get_aperture_type();
+    if (aperture_type == ApertureType::RECTANGLE) {
+        double width = m_aperture->get_width();
+        double height = m_aperture->get_height();
+        // get the rotation matrix
+        Matrix33d rotation_matrix = get_rotation_matrix();  // L2G rotation matrix
+        // transform the point to local coordinates
+        Vec3d point_local = rotation_matrix.transpose() * (point - m_origin);
+        // check if the point is inside the rectangle
+        if (point_local[0] >= -width / 2 && point_local[0] <= width / 2 &&
+            point_local[1] >= -height / 2 && point_local[1] <= height / 2 &&
+            std::abs(point_local[2]) < 1e-3) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // todo: do this for other aperture and surface types, not that this should be for post processing only
 }

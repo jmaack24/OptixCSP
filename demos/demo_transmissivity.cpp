@@ -104,17 +104,15 @@ int main(int argc, char* argv[]) {
 
     // create another element e5 same as e4
     CspElement e5 = *e4; // Copy e4 to e5
-    e5.set_origin(Vec3d(0, 1, 7.5));
-    system.add_element(std::make_shared<CspElement>(e5)); // Add e5 to the system
+    e5.set_origin(Vec3d(0, 0.1, 9.3));
     e5.set_receiver(false);
+	e5.use_refraction(true);
+	e5.set_transmissivity(0.5f); // 80% transmissive
+    e5.set_aperture(std::make_shared<ApertureRectangle>(receiver_dim_x*0.8, receiver_dim_y*0.8));
+
+    system.add_element(std::make_shared<CspElement>(e5)); // Add e5 to the system
 
     Vec3d sun_vector(0.0, 0.0, 100.0); // sun vector
-
-    // set up sun angle 
-    //double sun_angle = 0.00465; // 0.00465; // sun angle
-    //double sun_angle = 0; // 0.00465; // sun angle
-
-    //system.set_sun_angle(sun_angle);
     system.set_sun_vector(sun_vector);
 
     ///////////////////////////////////
@@ -131,7 +129,7 @@ int main(int argc, char* argv[]) {
     //////////////////////////
     // STEP 5  Post process //
     //////////////////////////
-    int num_hits = system.get_num_hits_receiver();
+    int num_hits = system.get_num_hits_receiver(*e4);
     std::cout << "Number of rays hitting the receiver: " << num_hits << std::endl;
 
     std::string out_dir = "out_transmissivity/";
